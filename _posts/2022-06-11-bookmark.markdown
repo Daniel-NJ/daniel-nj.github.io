@@ -1,0 +1,58 @@
+---
+layout:     post
+title:      "计算机体系结构 第四章data-parallelism阅读记录"
+subtitle:   "计算机体系结构 第四章"
+date:       2022-06-11
+author:     "Peng"
+header-img: "img/post-bg-unix-linux.jpg"
+tags:
+    - 读书笔记
+    - Computer Architecture
+    - 翻译
+---
+
+
+> #### 首先开头部分的一句引言很有趣，假如你要犁地，你是用两头强壮的公牛，还是选择用1024只鸡呢？
+
+我想公牛在这里是想类比scalar processers, 而1024鸡则是vector processers
+
+------
+## ***本节主要围绕三种数据并行架构，vector、SIMD、GPU***
+
+### **vector部分**  
+
+以RV64V这个riscV架构来做介绍，vector架构主要核心部分包括**vector registers**，**scaler registers**, **vector function uinits**（数学逻辑运算单元)，**vector load/store** 
+
+#### ***vector registers***
+* vector registers有若干读写口，通过crossbar连接到不同的vector function units。
+* RV64V的指令集采用suffix后缀来表示操作数的类型例如vsub.vv表示两个向量相减，类似vsub.vs 表示向量减去一个标量。其指令集没有区分操作的数据类型和大小，这些信息由寄存器来提供，因此在写代码的一开始，需要通过指令来配置寄存器的类型和位宽。  
+书中举了一个计算axpy的例子Y=aX+Y  
+![](/img/in-post/axpy-asm-compare.png)  
+分别对比了riscV和r64v架构的指令过程。 总结了r64v由如下的优势，
+  1. 指令带宽需求降低了很多，这是显而易见的，一条指令操作的数据比通用riscV要多若干倍了
+  2. 另一个优势是pipeline inter-lock的机制不一样，通用riscV是前后有数据依赖的指令，后者每次都需要等待前者完成，但是r64v，后者只需等vector register中的第一个数据ready就可以启动了，这样能隐藏不少上一条指令的时间。  
+   
+  接着又举了一个dynamic register typing的例子，例如axpy中标量乘向量改成fp32， 然后向量相加仍然用fp64，只需要改一行配置寄存器类型的代码就可以了  
+  ![](/img/in-post/change-type.png)
+
+#### ***vector execution time***
+  接下来讲的是如何估算一段vector instructions的性能，通常向量指令序列的执行时间和三个因素有关
+  1. 寄存器的长度
+  2. 指令间的structural hazards
+  3. data dependency
+
+
+  书中将一段能一起执行的若干条指令记为convey(没有结构冒险)，用chime来表示执行一个convey需要多少时间  
+  估算性能的时候没有考虑两个因素
+  * 指令的发射所需的cycle，发射所需的cycle相对于指令真正的处理时间很小所以可以忽略
+  * 指令的start-up cycle，因为vector instruction都是pipeline的，有一个启动时间  
+
+#### ***如何处理 数据长度不是register length的倍数的情况***
+mvl表示的是向量寄存器的最大长度，rv64V是通过一条指令来来取min(mvl,n),代码上只需要写一个loop就同时处理正常块和尾块数据了
+
+#### ***如何处理 if/else***
+通过mask寄存器来disable某条lane，GPU和vector processor的区别在于，前者mask是通过硬件来设置mask的，mask 寄存器对软件不可见，后者是需要编译器来显示设置
+
+#### ***通过 memory bank 提升register 的带宽***  
+
+#### ***通过stride 跳步来处理多维矩阵数据***
