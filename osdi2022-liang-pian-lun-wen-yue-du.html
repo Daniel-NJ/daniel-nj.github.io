@@ -46,7 +46,7 @@
 eBPF提供了一个机制，能避免中间数据在kernel和user space间移动，例如遍历一个B-tree，遍历的中间节点实际上可以不用返回给user space，如果能
 在kernel space处理，直接发起访问下一个节点。
 接着文章提出了两种hook的地方，一个是在syscall，一个是在NVMe driver，显然hook点放在NVMe driver取得更大的优化效果。
-！<a href="/images/two-kernel-hook.png">two hook point</a></p>
+<img alt="two hook point" src="/images/two-kernel-hook.png"></p>
 <p>但是放到NVMe driver，存在一些技术障碍，因为在这里没法看到文件系统的meta data, 最后文章讲其是如何去克服这些障碍的....</p>
     </div><!-- /.entry-content -->
 
