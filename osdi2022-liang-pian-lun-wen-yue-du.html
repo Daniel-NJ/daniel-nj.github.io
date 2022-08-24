@@ -4,21 +4,27 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>Leonardo's Blog</title>
+        <title>OSDI2022 两篇论文阅读</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
+        <meta name="description" content="《XRP: In-Kernel Storage Functions with eBPF》这一篇文章介绍了一种对文件系统访问优化的手段， 通过eBPF（extend Berkeley Packet Filter) 一种将user space的函数offload到kernel..." />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
                 <h1><a href="/">Leonardo's Blog</a></h1>
                 <nav><ul>
-                    <li><a href="/category/paper-reading.html">Paper Reading</a></li>
+                    <li class="active"><a href="/category/paper-reading.html">Paper Reading</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/osdi2022-liang-pian-lun-wen-yue-du.html" rel="bookmark"
+           title="Permalink to OSDI2022 两篇论文阅读">OSDI2022 两篇论文阅读</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/osdi2022-liang-pian-lun-wen-yue-du.html">OSDI2022 两篇论文阅读</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2022-08-24T20:16:00+08:00">
                 Published: Wed 24 August 2022
@@ -29,7 +35,7 @@
         </address>
 <p>In <a href="/category/paper-reading.html">Paper Reading</a>.</p>
 
-</footer><!-- /.post-info --><p>《XRP: In-Kernel Storage Functions with eBPF》这一篇文章介绍了一种对文件系统访问优化的手段，
+</footer><!-- /.post-info -->      <p>《XRP: In-Kernel Storage Functions with eBPF》这一篇文章介绍了一种对文件系统访问优化的手段，
 通过eBPF（extend Berkeley Packet Filter) 一种将user space的函数offload到kernel space的linux框架，
 通过将某些中间的文件系统IO读写直接在kernel space处理，节省了其通过linux kernel stack的overhead 从而提高性能，</p>
 <p>文章的背景是当前出现了性能很高的NVMe存储器，带宽达到7GB/s， latency达到3us，这直接导致了linux kernel stack的开销占总通路的比重越来越大，
@@ -41,8 +47,11 @@ eBPF提供了一个机制，能避免中间数据在kernel和user space间移动
 在kernel space处理，直接发起访问下一个节点。
 接着文章提出了两种hook的地方，一个是在syscall，一个是在NVMe driver，显然hook点放在NVMe driver取得更大的优化效果。
 <img alt="two hook point" src="/images/two-kernel-hook.png"></p>
-<p>但是放到NVMe driver，存在一些技术障碍，因为在这里没法看到文件系统的meta data, 最后文章讲其是如何去克服这些障碍的....</p>                </article>
-            </aside><!-- /#featured -->
+<p>但是放到NVMe driver，存在一些技术障碍，因为在这里没法看到文件系统的meta data, 最后文章讲其是如何去克服这些障碍的....</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>

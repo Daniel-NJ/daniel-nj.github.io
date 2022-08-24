@@ -12,24 +12,36 @@
         <header id="banner" class="body">
                 <h1><a href="/">Leonardo's Blog</a></h1>
                 <nav><ul>
-                    <li><a href="/category/review.html">Review</a></li>
+                    <li><a href="/category/paper-reading.html">Paper Reading</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/my-first-review.html">My First Review</a></h1>
+                    <h1 class="entry-title"><a href="/osdi2022-liang-pian-lun-wen-yue-du.html">OSDI2022 两篇论文阅读</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2010-12-03T10:20:00+08:00">
-                Published: Fri 03 December 2010
+        <abbr class="published" title="2022-08-24T20:16:00+08:00">
+                Published: Wed 24 August 2022
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/leonardo.html">Leonardo</a>
         </address>
-<p>In <a href="/category/review.html">Review</a>.</p>
+<p>In <a href="/category/paper-reading.html">Paper Reading</a>.</p>
 
-</footer><!-- /.post-info --><p>Following is a review of my favorite mechanical keyboard.</p>                </article>
+</footer><!-- /.post-info --><p>《XRP: In-Kernel Storage Functions with eBPF》这一篇文章介绍了一种对文件系统访问优化的手段，
+通过eBPF（extend Berkeley Packet Filter) 一种将user space的函数offload到kernel space的linux框架，
+通过将某些中间的文件系统IO读写直接在kernel space处理，节省了其通过linux kernel stack的overhead 从而提高性能，</p>
+<p>文章的背景是当前出现了性能很高的NVMe存储器，带宽达到7GB/s， latency达到3us，这直接导致了linux kernel stack的开销占总通路的比重越来越大，
+如何bypass掉这些开销变成一种理所应当的优化方向。
+<img alt="Kernel’s latency overhead with 512 B random reads" src="/images/overhead.png"></p>
+<p>bypass kernel software stack有两种思路，一种是用user mode软件替代kernel mode的调用，另一种是将一些用户态的逻辑放到kernel里来执行，
+对于文件系统的优化貌似第二种更适合，因此提到了eBPF。
+eBPF提供了一个机制，能避免中间数据在kernel和user space间移动，例如遍历一个B-tree，遍历的中间节点实际上可以不用返回给user space，如果能
+在kernel space处理，直接发起访问下一个节点。
+接着文章提出了两种hook的地方，一个是在syscall，一个是在NVMe driver，显然hook点放在NVMe driver取得更大的优化效果。
+<img alt="two hook point" src="/images/two-kernel-hook.png"></p>
+<p>但是放到NVMe driver，存在一些技术障碍，因为在这里没法看到文件系统的meta data, 最后文章讲其是如何去克服这些障碍的....</p>                </article>
             </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
